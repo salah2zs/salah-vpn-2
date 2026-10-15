@@ -1,0 +1,29 @@
+name: Inspect libbox API
+on:
+  workflow_dispatch:
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+      - name: Download libbox 1.13.14
+        run: |
+          curl -fL https://jitpack.io/com/github/singbox-android/libbox/1.13.14/libbox-1.13.14.aar -o libbox.aar
+          sha256sum libbox.aar | tee api.txt
+          unzip -o -q libbox.aar -d aar
+          echo "--- AAR contents ---" >> api.txt
+          unzip -l libbox.aar >> api.txt
+      - name: Dump public API
+        run: |
+          cd aar
+          for c in $(unzip -Z1 classes.jar | grep '^io/nekohasekai/libbox/.*\.class$' | grep -v '\$' | sed 's/\.class$//;s#/#.#g'); do
+            echo "=== $c ===" >> ../api.txt
+            javap -public -cp classes.jar "$c" >> ../api.txt 2>&1
+          done
+      - uses: actions/upload-artifact@v4
+        with:
+          name: libbox-api
+          path: api.txt
