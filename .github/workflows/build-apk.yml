@@ -7,7 +7,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Unzip project
-        run: unzip -q probuild-solutions.zip -d project
+        run: unzip -q requirement-builder.zip -d project
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
@@ -27,5 +27,5 @@ jobs:
         run: gradle assembleDebug --no-daemon
       - uses: actions/upload-artifact@v4
         with:
-          name: salah-vpn-apk
+          name: salah-vpn-2-apk
           path: project/app/build/outputs/apk/debug/*.apk
